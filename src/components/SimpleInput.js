@@ -1,60 +1,62 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 const SimpleInput = (props) => {
-//setting input reference using useRef() hook
 
-const nameInputRef=useRef(); // methos -2
-const [enteredName ,setEnteredName]=useState('')
+  const [enteredName, setEnteredName] = useState('')
 
-//Another useState for checking the input is valid or not
-//initially it is true
-const [enteredNameIsValid, setEnteredNameIsValid]=useState(false);
+  const [enteredNameIsTouched, setEnteredNameIsTouched] = useState(false);
 
-const [enteredNameIsTouched, setEnteredNameIsTouched]=useState(false);
+  const enteredNameIsValid = enteredName.trim() !== "";
+  const nameInputIsInvalid = !enteredNameIsValid && enteredNameIsTouched;
 
-//get user input value with every key storke method-1
-const nameInputChangeHandler=(event)=>{
-setEnteredName(event.target.value);
-}
+  let formIsValid = false;
 
-//form submission handler
-const formSubmissionHandler=event=>{
-event.preventDefault();  
+  if (enteredNameIsValid) {
+    formIsValid = true;
+  }
 
-//here you go with useState method and checking form is valid or not 
+  //get user input value with form submission method-1
+  const nameInputChangeHandler = (event) => {
+    setEnteredName(event.target.value);
+  }
 
-setEnteredNameIsTouched(true)
+  const nameInputBlurHandler = event => {
+    setEnteredNameIsTouched(true);
+  }
 
-if(enteredName.trim()===""){
-  //adding the state here with false 
-  setEnteredNameIsValid(false);
-  return;
-}
-//if input is valid here
-setEnteredNameIsValid(true)
+  //form submission handler
+  const formSubmissionHandler = event => {
+    event.preventDefault();
+    //here you go with useState method and checking form is valid or not 
+    setEnteredNameIsTouched(true)
+    if (!enteredNameIsValid) {
+      return;
+    }
+    console.log("name:", enteredName);
+    setEnteredName('')
+    setEnteredNameIsTouched(false);
+  }
 
-console.log("name:", enteredName);
 
-// getting value input value and assign to a variable
-const enteredValue=nameInputRef.current.value;
-console.log(enteredValue)
-setEnteredName('')
-}
-const nameInputIsInvalid=!enteredNameIsValid && enteredNameIsTouched;
-
-const nameInputClass=nameInputIsInvalid?"form-control invalid":"form-control";
+  const nameInputClass = nameInputIsInvalid ? "form-control invalid" : "form-control";
   return (
-          /* initializing the formSubmissionHandle */
+    /* initializing the formSubmissionHandle */
     <form onSubmit={formSubmissionHandler}>
       <div className={nameInputClass}>
         <label htmlFor='name'>Your Name</label>
         {/* initializing the nameInputChangeHandler */}
-        <input ref={nameInputRef} type='text' id='name' onChange={nameInputChangeHandler} value={enteredName}/>
+        <input
+
+          type='text'
+          id='name'
+          onChange={nameInputChangeHandler}
+          onBlur={nameInputBlurHandler}
+          value={enteredName} />
         {/* here i'm showing the error conditionally  */}
         {nameInputIsInvalid && <p className="error-text"> Name must not br empty</p>}
       </div>
       <div className="form-actions">
-        <button>Submit</button>
+        <button disabled={!formIsValid}>Submit</button>
       </div>
     </form>
   );
